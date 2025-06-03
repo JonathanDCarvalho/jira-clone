@@ -1,3 +1,5 @@
+"use client";
+
 import { z } from "zod";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
@@ -14,7 +16,7 @@ import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
 
 export const SignInCard = () => {
-	const { mutate } = useLogin();
+	const { mutate, isPending } = useLogin();
 	const form = useForm<z.infer<typeof loginSchema>>({
 		resolver: zodResolver(loginSchema),
 		defaultValues: {
@@ -44,7 +46,7 @@ export const SignInCard = () => {
 							render={({ field }) => (
 								<FormItem>
 									<FormControl>
-										<Input {...field} type="email" placeholder="Enter email address" />
+										<Input {...field} disabled={isPending} type="email" placeholder="Enter email address" />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -63,7 +65,7 @@ export const SignInCard = () => {
 								</FormItem>
 							)}
 						/>
-						<Button disabled={false} className="w-full" type="submit" size={"lg"}>
+						<Button disabled={isPending} className="w-full" type="submit" size={"lg"}>
 							Login
 						</Button>
 					</form>
@@ -73,12 +75,12 @@ export const SignInCard = () => {
 				<DottedSeparator />
 			</div>
 			<CardContent className="p-7 flex flex-col gap-y-4">
-				<Button disabled={false} variant={"secondary"} size={"lg"} className="w-full">
+				<Button disabled={isPending} variant={"secondary"} size={"lg"} className="w-full">
 					<FcGoogle className="size-5 mr-2" />
 					Login with Google
 				</Button>
 
-				<Button disabled={false} variant={"secondary"} size={"lg"} className="w-full">
+				<Button disabled={isPending} variant={"secondary"} size={"lg"} className="w-full">
 					<FaGithub className="size-5 mr-2" />
 					Login with Github
 				</Button>
