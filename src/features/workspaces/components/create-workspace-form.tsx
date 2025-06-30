@@ -4,9 +4,11 @@ import { z } from "zod";
 import React, { useRef } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
 import { ImageIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,7 @@ interface CreateWorkspaceFormProps {
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
+	const router = useRouter();
 	const { mutate, isPending } = useCreateWorkspace();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const form = useForm<z.infer<typeof createWorkspaceSchema>>({
@@ -35,12 +38,15 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
 			image: values.image instanceof File ? values.image : "",
 		};
 
-		mutate({ form: finalValues }, {
-			onSuccess: () => {
-				form.reset();
-				// TODO: Redirect to new workspace
+		mutate(
+			{ form: finalValues },
+			{
+				onSuccess: ({ data }) => {
+					form.reset();
+					router.push(`/workspaces/${data.$id}`);
+				},
 			}
-		});
+		);
 	};
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +54,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
 		if (file) {
 			form.setValue("image", file);
 		}
-	}
+	};
 
 	return (
 		<Card className="w-full h-full border-none shadow-none">
@@ -67,14 +73,9 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
 								name="name"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>
-											Workspace Name
-										</FormLabel>
+										<FormLabel>Workspace Name</FormLabel>
 										<FormControl>
-											<Input
-											{...field}
-											placeholder="Enter workspace name"
-											/>
+											<Input {...field} placeholder="Enter workspace name" />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -93,7 +94,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
 											) : (
 												<Avatar className="size-[72px]">
 													<AvatarFallback>
-														<ImageIcon className="size-[36px] text-neutral-400"/>
+														<ImageIcon className="size-[36px] text-neutral-400" />
 													</AvatarFallback>
 												</Avatar>
 											)}
@@ -110,9 +111,9 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
 								)}
 							/>
 						</div>
-						<DottedSeparator className="py-7"/>
+						<DottedSeparator className="py-7" />
 						<div className="flex items-center justify-between">
-							<Button type="button" size={"lg"} variant={"secondary"} onClick={onCancel} disabled={isPending}>
+							<Button type="button" size={"lg"} variant={"secondary"} onClick={onCancel} disabled={isPending} className={cn(!onCancel && "invisible")}>
 								Cancel
 							</Button>
 
