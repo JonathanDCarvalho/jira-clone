@@ -1,4 +1,4 @@
-"use-client";
+"use client";
 
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { CreateWorkspaceForm } from "./create-workspace-form";
