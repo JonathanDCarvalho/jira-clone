@@ -102,9 +102,27 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
 												<p className="text-sm">Workspace Icon</p>
 												<p className="text-sm text-muted-foreground">JPG, PNG or JPEG, max 1mb</p>
 												<input type="file" className="hidden" accept=".jpg, .png, .jpeg, .svg" ref={inputRef} onChange={handleImageChange} disabled={isPending} />
-												<Button type="button" disabled={isPending} variant={"teritary"} size={"xs"} className="w-fit mt-2" onClick={() => inputRef.current?.click()}>
-													Upload Image
-												</Button>
+												{field.value ? (
+													<Button
+														type="button"
+														disabled={isPending}
+														variant={"destructive"}
+														size={"xs"}
+														className="w-fit mt-2"
+														onClick={() => {
+															field.onChange(null);
+															if (inputRef.current) {
+																inputRef.current.value = "";
+															}
+														}}
+													>
+														Remove Image
+													</Button>
+												) : (
+													<Button type="button" disabled={isPending} variant={"teritary"} size={"xs"} className="w-fit mt-2" onClick={() => inputRef.current?.click()}>
+														Upload Image
+													</Button>
+												)}
 											</div>
 										</div>
 									</div>

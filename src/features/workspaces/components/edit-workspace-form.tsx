@@ -5,7 +5,7 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { ImageIcon } from "lucide-react";
+import { ArrowLeftIcon, ImageIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ import { DottedSeparator } from "@/components/dotted-separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { updateWorkspaceSchema } from "../schemas";
-import { useCreateWorkspace } from "../api/use-create-workspace";
+import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { Workspace } from "../types";
 
 interface EditWorkspaceFormProps {
@@ -27,7 +27,7 @@ interface EditWorkspaceFormProps {
 export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceFormProps) => {
 	const router = useRouter();
 
-	const { mutate, isPending } = useCreateWorkspace();
+	const { mutate, isPending } = useUpdateWorkspace();
 
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -41,11 +41,11 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
 	const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
 		const finalValues = {
 			...values,
-			image: values.image instanceof File ? values.image : undefined,
+			image: values.image instanceof File ? values.image : "",
 		};
 
 		mutate(
-			{ form: finalValues, param: { workspaceId: initialValues.$id} },
+			{ form: finalValues, param: { workspaceId: initialValues.$id } },
 			{
 				onSuccess: ({ data }) => {
 					form.reset();
@@ -64,7 +64,11 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
 
 	return (
 		<Card className="w-full h-full border-none shadow-none">
-			<CardHeader className="flex p-7">
+			<CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
+				<Button size="sm" variant="secondary" onClick={onCancel ? onCancel : () => router.push(`/workspaces/${initialValues.$id}`)}>
+					<ArrowLeftIcon className="size-4 mr-2" />
+					Back
+				</Button>
 				<CardTitle className="text-xl font-bold">{initialValues.name}</CardTitle>
 			</CardHeader>
 			<div className="px-7">
@@ -108,9 +112,27 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
 												<p className="text-sm">Workspace Icon</p>
 												<p className="text-sm text-muted-foreground">JPG, PNG or JPEG, max 1mb</p>
 												<input type="file" className="hidden" accept=".jpg, .png, .jpeg, .svg" ref={inputRef} onChange={handleImageChange} disabled={isPending} />
-												<Button type="button" disabled={isPending} variant={"teritary"} size={"xs"} className="w-fit mt-2" onClick={() => inputRef.current?.click()}>
-													Upload Image
-												</Button>
+												{field.value ? (
+													<Button
+														type="button"
+														disabled={isPending}
+														variant={"destructive"}
+														size={"xs"}
+														className="w-fit mt-2"
+														onClick={() => {
+															field.onChange(null);
+															if (inputRef.current) {
+																inputRef.current.value = "";
+															}
+														}}
+													>
+														Remove Image
+													</Button>
+												) : (
+													<Button type="button" disabled={isPending} variant={"teritary"} size={"xs"} className="w-fit mt-2" onClick={() => inputRef.current?.click()}>
+														Upload Image
+													</Button>
+												)}
 											</div>
 										</div>
 									</div>
@@ -124,7 +146,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
 							</Button>
 
 							<Button type="submit" size={"lg"} variant={"primary"} disabled={isPending}>
-								Create Workspace
+								Save Changes
 							</Button>
 						</div>
 					</form>
