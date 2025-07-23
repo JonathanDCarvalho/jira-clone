@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { client } from "@/lib/rpc";
 
-type ResponseType = InferResponseType<(typeof client.api.projects)["$post"]>;
+type ResponseType = InferResponseType<(typeof client.api.projects)["$post"], 200>;
 type RequestType = InferRequestType<(typeof client.api.projects)["$post"]>;
 
 export const useCreateProject = () => {

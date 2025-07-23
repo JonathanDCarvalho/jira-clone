@@ -16,7 +16,7 @@ export const useGetProjects = ({
       });
 
 			if (!response.ok) {
-				throw new Error("Failded to fetch projects");
+				throw new Error("Failed to fetch projects");
 			}
 
 			const { data } = await response.json();
